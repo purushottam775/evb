@@ -1,10 +1,11 @@
 import express from "express";
-import { addSlot, updateSlot, listSlots, deleteSlot } from "../controllers/slotController.js";
+import { addSlot, updateSlot, listSlots, deleteSlot, getAllSlots } from "../controllers/slotController.js";
 import { adminProtect } from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
 
 // Admin routes
+router.get("/", adminProtect, getAllSlots); // Get all slots
 router.post("/", adminProtect, addSlot);
 router.put("/:id", adminProtect, updateSlot);
 router.delete("/:id", adminProtect, deleteSlot);

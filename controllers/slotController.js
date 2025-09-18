@@ -31,6 +31,20 @@ export const updateSlot = (req, res) => {
   });
 };
 
+// ---------------- Admin: Get all slots ----------------
+export const getAllSlots = (req, res) => {
+  const query = `
+    SELECT s.*, cs.station_name 
+    FROM Slot s 
+    JOIN ChargingStation cs ON s.station_id = cs.station_id 
+    ORDER BY s.station_id, s.slot_number
+  `;
+  db.query(query, (err, results) => {
+    if (err) return res.status(500).json({ message: err.message });
+    res.json({ slots: results });
+  });
+};
+
 // ---------------- Admin/User: List slots of a station ----------------
 export const listSlots = (req, res) => {
   const { station_id } = req.params;
