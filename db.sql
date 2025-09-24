@@ -43,21 +43,6 @@ CREATE TABLE Slot (
     UNIQUE(station_id, slot_number) -- prevent duplicate slot numbers in same station
 );
 
--- BOOKING TABLE
-CREATE TABLE Booking (
-    booking_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    slot_id INT NOT NULL,
-    station_id INT NOT NULL,
-    booking_date DATE NOT NULL,
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
-    payment_status VARCHAR(20) CHECK (payment_status IN ('paid', 'unpaid')),
-    booking_status VARCHAR(20) CHECK (booking_status IN ('active', 'completed', 'cancelled')),
-    CONSTRAINT fk_booking_user FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE,
-    CONSTRAINT fk_booking_slot FOREIGN KEY (slot_id) REFERENCES Slot(slot_id) ON DELETE CASCADE,
-    CONSTRAINT fk_booking_station FOREIGN KEY (station_id) REFERENCES ChargingStation(station_id) ON DELETE CASCADE
-);
 
 -- PAYMENT TABLE
 CREATE TABLE Payment (
@@ -71,30 +56,6 @@ CREATE TABLE Payment (
 );
 
 
-ALTER TABLE Booking 
-MODIFY COLUMN payment_status ENUM('paid','unpaid') NOT NULL DEFAULT 'unpaid',
-MODIFY COLUMN booking_status ENUM('active','completed','cancelled') NOT NULL DEFAULT 'active';
-
-
-ALTER TABLE Booking 
-MODIFY COLUMN booking_status ENUM('active','completed','cancelled','pending') NOT NULL DEFAULT 'active';
-
-
-ALTER TABLE Booking 
-MODIFY COLUMN payment_status ENUM('paid','unpaid','pending') NOT NULL DEFAULT 'unpaid';
-
-
-ALTER TABLE booking DROP CHECK booking_chk_1;
-ALTER TABLE booking
-MODIFY payment_status ENUM('pending','paid','unpaid') NOT NULL DEFAULT 'pending';
-ALTER TABLE booking
-MODIFY booking_status ENUM('pending','approved','rejected','cancelled') NOT NULL DEFAULT 'pending';
-
-INSERT INTO booking (user_id, slot_id, station_id, booking_date, start_time, end_time, booking_status, payment_status) 
-VALUES (1, 2, 3, '2025-09-15', '10:00:00', '11:00:00', 'pending', 'pending');
-
-
-SHOW CREATE TABLE booking;
 
 
 DROP TABLE IF EXISTS bookings;
