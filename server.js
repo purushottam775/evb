@@ -17,26 +17,50 @@ dotenv.config();
 const app = express();
 
 
+// Middleware
 app.use(cors({
-  origin: [
-    'http://localhost:5173', 
-    'http://localhost:5174', 
-    'http://127.0.0.1:5173', 
-    'http://127.0.0.1:5174',
-    'https://evf-2gfa.vercel.app',  // Vercel production URL
-    /\.vercel\.app$/,  // All Vercel preview and production URLs
-    /^https:\/\/evf-.*\.vercel\.app$/  // All Vercel deployments for this project
-  ],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:5173', 
+      'http://localhost:5174', 
+      'http://127.0.0.1:5173', 
+      'http://127.0.0.1:5174',
+      'https://evf-2gfa.vercel.app',  // Vercel production URL
+      'https://evf-cr9t.vercel.app',  // Vercel preview URL
+    ];
+    
+    // Check exact matches first
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Check if it's a Vercel app URL (any evf-*.vercel.app)
+    if (/^https:\/\/evf-[\w-]+\.vercel\.app$/.test(origin)) {
+      return callback(null, true);
+    }
+    
+    // Fallback: allow all Vercel preview URLs (for any project)
+    if (/\.vercel\.app$/.test(origin)) {
+      return callback(null, true);
+    }
+    
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 app.use(express.json());
 
 
 // Root route
 app.get("/", (req, res) => {
-  res.send("EV Slot Management Backend is running");
+  res.send("EV Slot Management Backend is running!");
 });
 
 
@@ -54,7 +78,7 @@ app.use("/api/bookings/admin", bookingAdminRoutes); // admin routes
 
 
 
-// Catch-all for invalid endpointsa
+// Catch-all for invalid endpoints
 app.use((req, res) => {
   res.status(404).json({ message: "Endpoint not found" });
 });
@@ -62,6 +86,5 @@ app.use((req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {  
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
