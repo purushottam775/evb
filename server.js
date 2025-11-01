@@ -17,10 +17,19 @@ dotenv.config();
 const app = express();
 
 
-// Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://127.0.0.1:5173', 'http://127.0.0.1:5174','https://evb-1i4y.onrender.com' ],
-  credentials: true
+  origin: [
+    'http://localhost:5173', 
+    'http://localhost:5174', 
+    'http://127.0.0.1:5173', 
+    'http://127.0.0.1:5174',
+    'https://evf-2gfa.vercel.app',  // Vercel production URL
+    /\.vercel\.app$/,  // All Vercel preview and production URLs
+    /^https:\/\/evf-.*\.vercel\.app$/  // All Vercel deployments for this project
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
