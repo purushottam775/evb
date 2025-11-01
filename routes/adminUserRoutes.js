@@ -5,7 +5,8 @@ import {
   blockUser,
   unblockUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  
 } from "../controllers/adminUserController.js";
 
 import { adminProtect } from "../middleware/adminMiddleware.js"; // ensure only admin can access

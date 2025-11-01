@@ -1,21 +1,37 @@
+// config/db.js
 import dotenv from "dotenv";
 dotenv.config(); // load env first
+
 import mysql from "mysql2";
 
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+const pool = mysql.createPool({
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "ev",
+  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306,
+  waitForConnections: true,
+  connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT, 10) || 10,
+  queueLimit: 0,
 });
 
-db.connect((err) => {
+// Quick warmup check (acquire & release one connection)
+pool.getConnection((err, conn) => {
   if (err) {
-    console.error("Database connection failed:", err.message);
+    console.error("MySQL pool connection failed:", err.message);
     process.exit(1);
-  } else {
-    console.log("MySQL Connected");
   }
+  if (conn) conn.release();
+  console.log("MySQL pool initialized");
 });
 
-export default db;
+// Graceful shutdown on SIGINT
+process.on("SIGINT", () => {
+  pool.end((err) => {
+    if (err) console.error("Error closing MySQL pool:", err);
+    else console.log("MySQL pool closed");
+    process.exit(err ? 1 : 0);
+  });
+});
+
+export default pool;

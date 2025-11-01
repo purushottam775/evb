@@ -9,7 +9,7 @@ export const getAllUsers = async (req, res) => {
       `SELECT 
          user_id, name, email, phone_number, vehicle_number, vehicle_type, 
          role, status, is_blocked, created_at, updated_at 
-       FROM user`
+       FROM User`
     );
     res.status(200).json({ success: true, users });
   } catch (err) {
@@ -23,7 +23,7 @@ export const blockUser = async (req, res) => {
   const { user_id } = req.params;
   try {
     await db.promise().query(
-      "UPDATE user SET is_blocked = TRUE WHERE user_id = ?",
+      "UPDATE User SET is_blocked = TRUE WHERE user_id = ?",
       [user_id]
     );
     res.status(200).json({ success: true, message: "User blocked successfully" });
@@ -38,7 +38,7 @@ export const unblockUser = async (req, res) => {
   const { user_id } = req.params;
   try {
     await db.promise().query(
-      "UPDATE user SET is_blocked = FALSE WHERE user_id = ?",
+      "UPDATE User SET is_blocked = FALSE WHERE user_id = ?",
       [user_id]
     );
     res.status(200).json({ success: true, message: "User unblocked successfully" });
@@ -54,7 +54,7 @@ export const updateUser = async (req, res) => {
   const { role, status } = req.body; // role: 'user'/'admin', status: 'active'/'inactive'
   try {
     await db.promise().query(
-      "UPDATE user SET role = ?, status = ? WHERE user_id = ?",
+      "UPDATE User SET role = ?, status = ? WHERE user_id = ?",
       [role, status, user_id]
     );
     res.status(200).json({ success: true, message: "User updated successfully" });
@@ -69,7 +69,7 @@ export const deleteUser = async (req, res) => {
   const { user_id } = req.params;
   try {
     await db.promise().query(
-      "DELETE FROM user WHERE user_id = ?",
+      "DELETE FROM User WHERE user_id = ?",
       [user_id]
     );
     res.status(200).json({ success: true, message: "User deleted successfully" });
