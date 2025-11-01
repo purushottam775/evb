@@ -27,7 +27,7 @@ app.use(express.json());
 
 // Root route
 app.get("/", (req, res) => {
-  res.send("EV Slot Management Backend is running!");
+  res.send("EV Slot Management Backend is running");
 });
 
 
